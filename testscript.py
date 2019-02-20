@@ -2,22 +2,29 @@ from pydub import AudioSegment
 import numpy as np
 from keras.layers import Input, Dense
 from keras.models import Model
+from sklearn.preprocessing import MinMaxScaler
+import os
+import sys
 
-# Get samples from song1
-song1 = AudioSegment.from_wav("TestSongs/California_Gurls.wav")
-samples1 = np.array(song1.get_array_of_samples())
-print(samples1.shape)
-
-# Get samples from song2
-song2 = AudioSegment.from_wav("TestSongs/Take_My_Bones_Away.wav")
-samples2 = np.array(song2.get_array_of_samples())
-print(samples2.shape)
+songlen = 2500000
+# Create an empty np array of size n where n is the total num of songs
+song_list = os.listdir("TestSongs")
+num_songs = len(song_list)
+song_data = np.zeros(shape=(num_songs,songlen))
+count = 0
+# Get the samples from each song
+for fname in os.listdir("TestSongs/"):
+    song = AudioSegment.from_wav("TestSongs/"+fname)
+    samples = np.array(song.get_array_of_samples())
+    samples = samples[:songlen]
+    song_data[count] = np.array(samples)
+    count = count + 1
 
 encoding_dim = 2
 
-input_song = Input(shape=(2883550,))
+input_song = Input(shape=(songlen,))
 encoded = Dense(encoding_dim, activation='relu')(input_song)
-decoded = Dense(2883550, activation='sigmoid')(encoded)
+decoded = Dense(songlen, activation='sigmoid')(encoded)
 # Map input to its reconstruction
 autoencoder = Model(input_song, decoded)
 
@@ -30,17 +37,25 @@ decoder = Model(encoded_input, decoder_layer(encoded_input))
 
 autoencoder.compile(optimizer='adadelta', loss='binary_crossentropy')
 
-#x_train = samples1
-x_train = np.array([samples1, samples2])
-x_test = np.array([samples1, samples2])
+x_train = song_data
+x_test = song_data
+x_train = x_train.astype('float32')
+x_test = x_test.astype('float32')
+print(x_train.dtype)
+scaler = MinMaxScaler()
+scaler.fit(x_train)
+x_train = scaler.transform(x_train)
+x_test = scaler.transform(x_test)
+print(np.min(x_train))
+print(np.max(x_train))
 
 print(x_train.shape)
 print(x_test.shape)
 
-# Training the data for 50 epochs
+# Training the data for e epochs
 autoencoder.fit(x_train, x_train,
-                epochs=50,
-                batch_size=256,
+                epochs=int(sys.argv[1]),
+                batch_size=2,
                 shuffle=True,
                 validation_data=(x_test, x_test))
 
