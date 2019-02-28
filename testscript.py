@@ -41,16 +41,16 @@ x_train = song_data
 x_test = song_data
 x_train = x_train.astype('float32')
 x_test = x_test.astype('float32')
-print(x_train.dtype)
+#print(x_train.dtype)
 scaler = MinMaxScaler()
 scaler.fit(x_train)
 x_train = scaler.transform(x_train)
 x_test = scaler.transform(x_test)
-print(np.min(x_train))
-print(np.max(x_train))
+#print(np.min(x_train))
+#print(np.max(x_train))
 
-print(x_train.shape)
-print(x_test.shape)
+#print(x_train.shape)
+#print(x_test.shape)
 
 # Training the data for e epochs
 autoencoder.fit(x_train, x_train,
@@ -64,3 +64,5 @@ decoded_songs = decoder.predict(encoded_songs)
 
 print(encoded_songs)
 print(decoded_songs)
+
+np.save('encoded_songs_'+sys.argv[1],encoded_songs)
