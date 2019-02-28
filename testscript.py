@@ -66,3 +66,15 @@ print(encoded_songs)
 print(decoded_songs)
 
 np.save('encoded_songs_'+sys.argv[1],encoded_songs)
+
+
+# use Matplotlib (don't ask)
+import matplotlib.pyplot as plt
+
+count = 0
+plt.figure()
+for fname in os.listdir("TestSongs/"):
+  plt.scatter(encoded_songs[count][0], encoded_songs[count][1], s=700,
+              c=(encoded_songs[count][1]/10.0,0,1-encoded_songs[count][1]/10.0),
+              marker=r"$ {} $".format(fname[:10]), edgecolors='none')
+plt.show()
