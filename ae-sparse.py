@@ -2,6 +2,7 @@ from pydub import AudioSegment
 import numpy as np
 from keras.layers import Input, Dense
 from keras.models import Model
+from keras import regularizers
 from sklearn.preprocessing import MinMaxScaler
 import os
 import sys
@@ -23,7 +24,7 @@ for fname in os.listdir("TestSongs/"):
 encoding_dim = 2
 
 input_song = Input(shape=(songlen,))
-encoded = Dense(encoding_dim, activation='relu')(input_song)
+encoded = Dense(encoding_dim, activation='relu', activity_regularizer=regularizers.l1(10e-5))(input_song)
 decoded = Dense(songlen, activation='sigmoid')(encoded)
 # Map input to its reconstruction
 autoencoder = Model(input_song, decoded)
