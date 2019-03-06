@@ -65,7 +65,7 @@ decoded_songs = decoder.predict(encoded_songs)
 print(encoded_songs)
 print(decoded_songs)
 
-np.save('deep_encoded_songs_'+sys.argv[1],encoded_songs)
+np.save(str(num_songs)+'_deep_encoded_songs_'+sys.argv[1]+'_epochs',encoded_songs)
 
 
 import matplotlib.pyplot as plt
