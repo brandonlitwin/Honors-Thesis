@@ -23,14 +23,19 @@ for fname in os.listdir("TestSongs/"):
 encoding_dim = 2
 
 input_song = Input(shape=(songlen,))
-encoded = Dense(encoding_dim, activation='relu')(input_song)
-decoded = Dense(songlen, activation='sigmoid')(encoded)
+encoded = Dense(512, activation='relu')(input_song)
+encoded = Dense(64, activation='relu')(encoded)
+encoded = Dense(2, activation='relu')(encoded)
+
+decoded = Dense(64, activation='relu')(encoded)
+decoded = Dense(512, activation='relu')(decoded)
+decoded = Dense(songlen, activation='sigmoid')(decoded)
 # Map input to its reconstruction
 autoencoder = Model(input_song, decoded)
 
 # Map input to its encoded representation
 encoder = Model(input_song, encoded)
-
+encoded = Dense(512, activation='relu')(input_song)
 encoded_input = Input(shape=(encoding_dim,))
 decoder_layer = autoencoder.layers[-1]
 decoder = Model(encoded_input, decoder_layer(encoded_input))
