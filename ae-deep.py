@@ -23,22 +23,18 @@ for fname in os.listdir("TestSongs/"):
 encoding_dim = 2
 
 input_song = Input(shape=(songlen,))
-encoded = Dense(512, activation='relu')(input_song)
-encoded = Dense(64, activation='relu')(encoded)
-encoded = Dense(2, activation='relu')(encoded)
+encoded = Dense(32, activation='linear')(input_song)
+encoded = Dense(8, activation='linear')(encoded)
+encoded = Dense(encoding_dim, activation='linear')(encoded)
 
-decoded = Dense(64, activation='relu')(encoded)
-decoded = Dense(512, activation='relu')(decoded)
+decoded = Dense(8, activation='linear')(encoded)
+decoded = Dense(32, activation='linear')(decoded)
 decoded = Dense(songlen, activation='sigmoid')(decoded)
 # Map input to its reconstruction
 autoencoder = Model(input_song, decoded)
 
 # Map input to its encoded representation
 encoder = Model(input_song, encoded)
-encoded = Dense(512, activation='relu')(input_song)
-encoded_input = Input(shape=(encoding_dim,))
-decoder_layer = autoencoder.layers[-1]
-decoder = Model(encoded_input, decoder_layer(encoded_input))
 
 autoencoder.compile(optimizer='adadelta', loss='binary_crossentropy')
 
@@ -65,10 +61,8 @@ autoencoder.fit(x_train, x_train,
                 validation_data=(x_test, x_test))
 
 encoded_songs = encoder.predict(x_test)
-decoded_songs = decoder.predict(encoded_songs)
 
 print(encoded_songs)
-print(decoded_songs)
 
 np.save(str(num_songs)+'_deep_encoded_songs_'+sys.argv[1]+'_epochs',encoded_songs)
 

@@ -24,7 +24,8 @@ for fname in os.listdir("TestSongs/"):
 encoding_dim = 2
 
 input_song = Input(shape=(songlen,))
-encoded = Dense(encoding_dim, activation='relu', activity_regularizer=regularizers.l1(10e-5))(input_song)
+encoded = Dense(encoding_dim, activation='relu',
+                activity_regularizer=regularizers.l1(10e-8))(input_song)
 decoded = Dense(songlen, activation='sigmoid')(encoded)
 # Map input to its reconstruction
 autoencoder = Model(input_song, decoded)
@@ -74,7 +75,10 @@ import matplotlib.pyplot as plt
 count = 0
 plt.figure()
 for fname in os.listdir("TestSongs/"):
+  print(encoded_songs[count][0])
+  print(encoded_songs[count][1])
   plt.scatter(encoded_songs[count][0], encoded_songs[count][1], s=700,
               c=(encoded_songs[count][1]/10.0,0,1-encoded_songs[count][1]/10.0),
               marker=r"$ {} $".format(fname[:2]), edgecolors='none')
+  count += 1
 plt.show()
