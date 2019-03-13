@@ -73,6 +73,6 @@ count = 0
 plt.figure()
 for fname in os.listdir("TestSongs/"):
   plt.scatter(encoded_songs[count][0], encoded_songs[count][1], s=700,
-              c=(encoded_songs[count][1]/10.0,0,1-encoded_songs[count][1]/10.0),
+              c=(int(encoded_songs[count][1]/10.0),0,int(1-encoded_songs[count][1]/10.0)),
               marker=r"$ {} $".format(fname[:2]), edgecolors='none')
 plt.show()
