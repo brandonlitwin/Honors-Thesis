@@ -43,7 +43,8 @@ x_test = song_data
 x_train = x_train.astype('float32')
 x_test = x_test.astype('float32')
 #print(x_train.dtype)
-scaler = MinMaxScaler()
+#scaler = MinMaxScaler()
+scaler = MinMaxScaler(feature_range=(0,1))
 scaler.fit(x_train)
 x_train = scaler.transform(x_train)
 x_test = scaler.transform(x_test)
@@ -69,10 +70,15 @@ np.save(str(num_songs)+'_deep_encoded_songs_'+sys.argv[1]+'_epochs',encoded_song
 
 import matplotlib.pyplot as plt
 
+scaler = MinMaxScaler(feature_range=(0,1))
+#scaler = MinMaxScaler()
 count = 0
+encoded_songs = scaler.fit_transform(encoded_songs)
+print(encoded_songs)
 plt.figure()
 for fname in os.listdir("TestSongs/"):
   plt.scatter(encoded_songs[count][0], encoded_songs[count][1], s=700,
-              c=(int(encoded_songs[count][1]/10.0),0,int(1-encoded_songs[count][1]/10.0)),
-              marker=r"$ {} $".format(fname[:2]), edgecolors='none')
+              c=(encoded_songs[count][1]*encoded_songs[count][1]),
+              marker=r"$ {} $".format(fname[:4]), edgecolors='none')
+  count += 1
 plt.show()
