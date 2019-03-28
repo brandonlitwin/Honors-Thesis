@@ -22,22 +22,22 @@ for fname in os.listdir("TestSongs/"):
 
 encoding_dim = 2
 
-input_song = Input(shape=(None,songlen))#Input(shape=(songlen,))
+input_song = Input(shape=(songlen,))#Input(shape=(songlen,))
 print(input_song)
-encoded = Conv1D(16, num_songs, activation='relu', padding='same')(input_song)
-encoded = MaxPooling1D(2, padding='same')(encoded)
-encoded = Conv1D(encoding_dim, num_songs, activation='relu', padding='same')(encoded)
-encoded = MaxPooling1D(2, padding='same')(encoded)
-encoded = Conv1D(encoding_dim, num_songs, activation='relu', padding='same')(encoded)
-encoded = MaxPooling1D(2, padding='same')(encoded)
+encoded = Conv1D(32, 33, activation='relu', padding='same')(input_song)
+encoded = MaxPooling1D(10, padding='same')(encoded)
+encoded = Conv1D(8, 77, activation='relu', padding='same')(encoded)
+encoded = MaxPooling1D(10, padding='same')(encoded)
+encoded = Conv1D(encoding_dim, 155, activation='relu', padding='same')(encoded)
+encoded = MaxPooling1D(10, padding='same')(encoded)
 
-decoded = Conv1D(encoding_dim, num_songs, activation='relu', padding='same')(encoded)
-decoded = UpSampling1D(2)(decoded)
-decoded = Conv1D(encoding_dim, num_songs, activation='relu', padding='same')(encoded)
-decoded = UpSampling1D(2)(decoded)
-decoded = Conv1D(16, num_songs, activation='relu')(decoded)
-decoded = UpSampling1D(2)(decoded)
-decoded = Conv1D(1, num_songs, activation='sigmoid', padding='same')(decoded)
+decoded = Conv1D(encoding_dim, 155, activation='relu', padding='same')(encoded)
+decoded = UpSampling1D(10)(decoded)
+decoded = Conv1D(8, 77, activation='relu', padding='same')(encoded)
+decoded = UpSampling1D(10)(decoded)
+decoded = Conv1D(32, 33, activation='relu')(decoded)
+decoded = UpSampling1D(10)(decoded)
+decoded = Conv1D(1, 33, activation='sigmoid', padding='same')(decoded)
 
 # Map input to its reconstruction
 autoencoder = Model(input_song, decoded)
