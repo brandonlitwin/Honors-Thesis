@@ -3,7 +3,9 @@ import numpy as np
 from keras.layers import Input, Dense
 from keras.models import Model
 from keras.callbacks import ModelCheckpoint
+from keras.callbacks import LambdaCallback
 from sklearn.preprocessing import MinMaxScaler
+from sklearn.externals import joblib 
 import os
 import sys
 
@@ -47,6 +49,8 @@ x_test = x_test.astype('float32')
 #scaler = MinMaxScaler()
 scaler = MinMaxScaler(feature_range=(0,1))
 scaler.fit(x_train)
+joblib.dump(scaler, 'songScaler.pkl') 
+
 x_train = scaler.transform(x_train)
 x_test = scaler.transform(x_test)
 #print(np.min(x_train))
@@ -58,11 +62,15 @@ x_test = scaler.transform(x_test)
 # define checkpoint callback                                                     
 filepath = 'model-ep{epoch:03d}-loss{loss:.3f}-val_loss{val_loss:.3f}.h5'        
 checkpoint = ModelCheckpoint(filepath, monitor='val_loss', verbose=1, save_best_only=True, mode='min')                    
+
+def on_epoch_end(epoch, _):
+  encoder.save('model-ep'+str(epoch)+'.h5')
+
 # Training the data for e epochs
 autoencoder.fit(x_train, x_train,
                 epochs=int(sys.argv[1]),
                 batch_size=2,
-                callbacks=[checkpoint],
+                callbacks=[checkpoint,LambdaCallback(on_epoch_end=on_epoch_end)],
                 shuffle=True,
                 validation_data=(x_test, x_test))
 
@@ -79,6 +87,7 @@ scaler = MinMaxScaler(feature_range=(0,1))
 #scaler = MinMaxScaler()
 count = 0
 encoded_songs = scaler.fit_transform(encoded_songs)
+joblib.dump(scaler, 'displayScaler.pkl') 
 print(encoded_songs)
 plt.figure()
 for fname in os.listdir("TestSongs/"):

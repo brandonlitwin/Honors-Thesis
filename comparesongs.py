@@ -3,6 +3,7 @@ import numpy as np
 from keras.layers import Input, Dense
 from keras.models import Model, load_model
 from sklearn.preprocessing import MinMaxScaler
+from sklearn.externals import joblib 
 import os
 import sys
 
@@ -12,7 +13,7 @@ song_list = os.listdir("TestSongs")
 num_songs = len(song_list)
 song_data = np.zeros(shape=(num_songs,songlen))
 # Get the samples from each song
-fname = "Cold.wav"
+fname = "africa-toto.wav"
 song = AudioSegment.from_wav("TestSongs/"+fname)
 samples = np.array(song.get_array_of_samples())
 samples = samples[:songlen]
@@ -46,9 +47,7 @@ x_test = song_data.reshape(1,-1)
 x_test = x_test.astype('float32')
 #print(x_train.dtype)
 #scaler = MinMaxScaler()
-scaler = MinMaxScaler(feature_range=(0,1))
-#scaler.fit(x_train)
-scaler.fit(x_test)
+scaler = joblib.load('songScaler.pkl') 
 #x_train = scaler.transform(x_train)
 x_test = scaler.transform(x_test)
 #print(np.min(x_train))
@@ -59,8 +58,10 @@ x_test = scaler.transform(x_test)
 
 
 encoded_song = autoencoder.predict(x_test)
+print(encoded_song)
 
-encoded_song = scaler.fit_transform(encoded_song)
+scaler = joblib.load('displayScaler.pkl') 
+encoded_song = scaler.transform(encoded_song)
 print(encoded_song)
 
 
