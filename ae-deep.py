@@ -2,6 +2,7 @@ from pydub import AudioSegment
 import numpy as np
 from keras.layers import Input, Dense
 from keras.models import Model
+from keras.callbacks import ModelCheckpoint
 from sklearn.preprocessing import MinMaxScaler
 import os
 import sys
@@ -54,10 +55,14 @@ x_test = scaler.transform(x_test)
 #print(x_train.shape)
 #print(x_test.shape)
 
+# define checkpoint callback                                                     
+filepath = 'model-ep{epoch:03d}-loss{loss:.3f}-val_loss{val_loss:.3f}.h5'        
+checkpoint = ModelCheckpoint(filepath, monitor='val_loss', verbose=1, save_best_only=True, mode='min')                    
 # Training the data for e epochs
 autoencoder.fit(x_train, x_train,
                 epochs=int(sys.argv[1]),
                 batch_size=2,
+                callbacks=[checkpoint],
                 shuffle=True,
                 validation_data=(x_test, x_test))
 
@@ -78,7 +83,7 @@ print(encoded_songs)
 plt.figure()
 for fname in os.listdir("TestSongs/"):
   plt.scatter(encoded_songs[count][0], encoded_songs[count][1], s=700,
-              c=(encoded_songs[count][1]*encoded_songs[count][1]),
+              c=(int(encoded_songs[count][1]/10.0),0,int(1-encoded_songs[count][1]/10.0)),
               marker=r"$ {} $".format(fname[:4]), edgecolors='none')
   count += 1
 plt.show()
