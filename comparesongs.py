@@ -71,4 +71,8 @@ for val in result:
    
 closest_song = (min(xdata, key=lambda x:abs(x-encoded_song[0][0])), min(ydata, key=lambda x:abs(x-encoded_song[0][1])))
 print(closest_song)
-
+sql = "SELECT name from songs INNER JOIN song_data ON songs.id = song_data.id WHERE xdata = " + str(closest_song[0]) + " AND ydata = " + str(closest_song[1])
+print(sql)
+mycursor.execute(sql)
+result = mycursor.fetchone()
+print(result[0])
