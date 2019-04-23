@@ -6,6 +6,7 @@ from sklearn.preprocessing import MinMaxScaler
 from sklearn.externals import joblib 
 import os
 import sys
+import mysql.connector
 
 songlen = 2500000
 # Create an empty np array of size n where n is the total num of songs
@@ -13,7 +14,7 @@ song_list = os.listdir("TestSongs")
 num_songs = len(song_list)
 song_data = np.zeros(shape=(num_songs,songlen))
 # Get the samples from each song
-fname = "africa-toto.wav"
+fname = "Cold.wav"
 song = AudioSegment.from_wav("TestSongs/"+fname)
 samples = np.array(song.get_array_of_samples())
 samples = samples[:songlen]
@@ -33,29 +34,15 @@ print(input_song.shape)
 import glob
 list_of_files = glob.glob('model*.h5')
 filename = max(list_of_files, key=os.path.getctime)
-print(filename)
 autoencoder = load_model(filename)
 
-# Map input to its encoded representation
-#encoder = Model(input_song, encoded)
-
-#autoencoder.compile(optimizer='adadelta', loss='binary_crossentropy')
-
-#x_train = song_data.reshape(1,-1)
 x_test = song_data.reshape(1,-1)
-#x_train = x_train.astype('float32')
+
 x_test = x_test.astype('float32')
-#print(x_train.dtype)
-#scaler = MinMaxScaler()
+
 scaler = joblib.load('songScaler.pkl') 
-#x_train = scaler.transform(x_train)
+
 x_test = scaler.transform(x_test)
-#print(np.min(x_train))
-#print(np.max(x_train))
-
-#print(x_train.shape)
-#print(x_test.shape)
-
 
 encoded_song = autoencoder.predict(x_test)
 print(encoded_song)
@@ -64,4 +51,24 @@ scaler = joblib.load('displayScaler.pkl')
 encoded_song = scaler.transform(encoded_song)
 print(encoded_song)
 
+# Time to compare the new song to the database
+
+mydb = mysql.connector.connect(
+    host="localhost",
+    user='root',
+    database="honors"
+)
+mycursor = mydb.cursor()
+
+mycursor.execute("SELECT xdata, ydata FROM song_data")
+result = mycursor.fetchall()
+
+xdata = []
+ydata = []
+for val in result:
+    xdata.append(val[0])
+    ydata.append(val[1])
+   
+closest_song = (min(xdata, key=lambda x:abs(x-encoded_song[0][0])), min(ydata, key=lambda x:abs(x-encoded_song[0][1])))
+print(closest_song)
 
