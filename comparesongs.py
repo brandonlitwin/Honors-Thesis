@@ -65,15 +65,40 @@ result = mycursor.fetchone()
 data = result[0]
 print(data)
 sys.stdout.flush()
-"""mycursor.execute("SELECT xdata, ydata FROM song_data")
+"""mycursor.execute("SELECT s.name as name, 
+                            sd.xdata as xdata, 
+                            sd.ydata as ydata 
+                    FROM songs s 
+                    inner join song_data sd
+                        on  s.id = sd.id")
 result = mycursor.fetchall()
 
-xdata = []
-ydata = []
+alls = {}
+plt.figure(figsize=(10,10))
 for val in result:
-    #print(val[0],val[1])
-    xdata.append(val[0])
-    ydata.append(val[1])"""
+    plt.plot(val[1],val[2],'k.')
+    alls[val[0]] = [val[1],val[2],sqrt((val[1]-encoded_song[0][0])**2
+                                      +(val[2]-encoded_song[0][0])**2)]
+
+bestk = ''
+bestv = []
+bestd = 1000000000000000
+
+for key in alls.keys():
+    if alls[key][2] < bestd:
+        bestd=alls[key][2]
+        bestv=alls[key]
+        bestk=key
+
+plt.plot(bestv[1],bestv[2],'ro')
+plt.title('Distance to song:' + str(bestd) + '. Recommended Song: ' + bestk)
+plt.savefig('result-'+bestk+'-.png',dpi=350)
+plt.clf()
+plt.close()
+
+
+
+"""
    
 """closest_song = (min(xdata, key=lambda x:abs(x-encoded_song[0][0])), min(ydata, key=lambda x:abs(x-encoded_song[0][1])))
 print(closest_song)
