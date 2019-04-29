@@ -58,28 +58,24 @@ mydb = mysql.connector.connect(
     database="honors"
 )
 mycursor = mydb.cursor()
-sql = "SELECT name FROM songs WHERE id = (SELECT id FROM song_data ORDER BY ABS (xdata - " + str(encoded_song[0][0]) + ") + ABS (ydata - " + str(encoded_song[0][1]) + ") LIMIT 1)"
+#sql = "SELECT name FROM songs WHERE id = (SELECT id FROM song_data ORDER BY ABS (xdata - " + str(encoded_song[0][0]) + ") + ABS (ydata - " + str(encoded_song[0][1]) + ") LIMIT 1)"
 #print(sql)
-mycursor.execute(sql)
-result = mycursor.fetchone()
-data = result[0]
-print(data)
-sys.stdout.flush()
-"""mycursor.execute("SELECT s.name as name, 
-                            sd.xdata as xdata, 
-                            sd.ydata as ydata 
-                    FROM songs s 
-                    inner join song_data sd
-                        on  s.id = sd.id")
+#mycursor.execute(sql)
+#result = mycursor.fetchone()
+#data = result[0]
+#print(data)
+#sys.stdout.flush()
+mycursor.execute("SELECT s.name as name, sd.xdata as xdata, sd.ydata as ydata FROM songs s inner join song_data sd on s.id = sd.id")
 result = mycursor.fetchall()
-
+import matplotlib.pyplot as plt
+import math
 alls = {}
 plt.figure(figsize=(10,10))
 for val in result:
     plt.plot(val[1],val[2],'k.')
-    alls[val[0]] = [val[1],val[2],sqrt((val[1]-encoded_song[0][0])**2
-                                      +(val[2]-encoded_song[0][0])**2)]
-
+    alls[val[0]] = [val[1],val[2],math.sqrt((val[1]-encoded_song[0][0])**2
+                                      +(val[2]-encoded_song[0][1])**2)]
+print(encoded_song)
 bestk = ''
 bestv = []
 bestd = 1000000000000000
@@ -92,13 +88,14 @@ for key in alls.keys():
 
 plt.plot(bestv[1],bestv[2],'ro')
 plt.title('Distance to song:' + str(bestd) + '. Recommended Song: ' + bestk)
+plt.xlabel("First autoencoder dimension")
+plt.ylabel("Second autoencoder dimension")
 plt.savefig('result-'+bestk+'-.png',dpi=350)
+plt.show()
+#print(bestk)
 plt.clf()
 plt.close()
 
-
-
-"""
    
 """closest_song = (min(xdata, key=lambda x:abs(x-encoded_song[0][0])), min(ydata, key=lambda x:abs(x-encoded_song[0][1])))
 print(closest_song)
