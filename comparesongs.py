@@ -32,7 +32,7 @@ input_song = Input(shape=(songlen,))
 """import glob
 list_of_files = glob.glob('model*.h5')
 filename = max(list_of_files, key=os.path.getctime)"""
-filename = 'model-ep31.h5'
+filename = 'this-is-the-model.h5'
 autoencoder = load_model(filename)
 #print(filename)
 x_test = song_data.reshape(1,-1)
@@ -65,7 +65,7 @@ mycursor = mydb.cursor()
 #data = result[0]
 #print(data)
 #sys.stdout.flush()
-mycursor.execute("SELECT s.name as name, sd.xdata as xdata, sd.ydata as ydata FROM songs s inner join song_data sd on s.id = sd.id")
+mycursor.execute("SELECT name, xdata, ydata FROM song_data")
 result = mycursor.fetchall()
 import matplotlib.pyplot as plt
 import math
@@ -73,9 +73,8 @@ alls = {}
 plt.figure(figsize=(10,10))
 for val in result:
     plt.plot(val[1],val[2],'k.')
-    alls[val[0]] = [val[1],val[2],math.sqrt((val[1]-encoded_song[0][0])**2
-                                      +(val[2]-encoded_song[0][1])**2)]
-print(encoded_song)
+    alls[val[0]] = [val[1],val[2],math.sqrt(((val[1]-encoded_song[0][0])**2)+((val[2]-encoded_song[0][1])**2))]
+#print(encoded_song)
 bestk = ''
 bestv = []
 bestd = 1000000000000000
@@ -85,13 +84,17 @@ for key in alls.keys():
         bestd=alls[key][2]
         bestv=alls[key]
         bestk=key
+        #print(bestv)
 
-plt.plot(bestv[1],bestv[2],'ro')
+plt.plot(encoded_song[0][0], encoded_song[0][1], 'go')
+plt.plot(bestv[0],bestv[1],'ro')
 plt.title('Distance to song:' + str(bestd) + '. Recommended Song: ' + bestk)
 plt.xlabel("First autoencoder dimension")
 plt.ylabel("Second autoencoder dimension")
 plt.savefig('result-'+bestk+'-.png',dpi=350)
-plt.show()
+print('result-'+bestk+'-.png');
+#plt.savefig('result.png',dpi=350)
+#plt.show()
 #print(bestk)
 plt.clf()
 plt.close()
